@@ -1,13 +1,15 @@
 const config = require("./utils/config");
 const express = require("express");
 require("express-async-errors");
-const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
 const middleware = require("./utils/middleware");
 const blogsRouter = require("./controllers/blogs");
 const usersRouter = require("./controllers/users");
 const loginRouter = require("./controllers/login");
+
+const app = express();
+app.use(express.static("build"));
 
 mongoose
   .connect(config.MONGODB_URI)
@@ -19,6 +21,7 @@ mongoose
   });
 
 app.use(cors());
+
 app.use(express.json());
 if (process.env.NODE_ENV === "test") {
   const testingRouter = require("./controllers/testing");
