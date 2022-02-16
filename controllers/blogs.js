@@ -1,101 +1,44 @@
+/* eslint-disable no-undef */
 const blogsRouter = require("express").Router();
-const Blog = require("../models/blog");
+const { Blog } = require("../models");
 
-blogsRouter.get("/", async (request, response) => {
-  const blogs = await Blog.find({}).populate("userId", {
-    username: 1,
-    name: 1,
-  });
-  response.json(blogs);
-});
-blogsRouter.get("/:id", async (request, response) => {
-  const id = request.params.id;
-  const blog = await Blog.findById(id).populate("userId", {
-    username: 1,
-    name: 1,
-  });
-  if (blog) {
-    response.json(blog);
-  } else {
-    response
-      .status(404)
-      .json({ error: `cannot find blog with id ${id}` })
-      .end();
-  }
+blogsRouter.get("/", async (req, res) => {
+  const blogs = await Blog.findAll();
+  // console.log(JSON.stringify(blogs, null, 2));
+  res.json(blogs);
 });
 
-blogsRouter.post("/", async (request, response) => {
-  const body = request.body;
-  const user = request.user;
-
-  const blog = new Blog({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes || 0,
-    userId: user._id,
-  });
-
-  const addedBlog = await blog.save();
-  user.blogs = user.blogs.concat(addedBlog._id);
-  await user.save();
-
-  response.status(201).json(addedBlog);
-});
-blogsRouter.put("/:id", async (request, response) => {
-  const body = request.body;
-  const id = request.params.id;
-
-  const blog = {
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes,
-  };
-
-  const updatedBlog = await Blog.findByIdAndUpdate(id, blog, {
-    new: true,
-  });
-
-  if (updatedBlog) {
-    response.json(updatedBlog);
-  } else {
-    response.status(404).end();
-  }
+blogsRouter.post("/", async (req, res) => {
+  console.log(req.body);
+  const blog = await Blog.create(req.body);
+  res.json(blog);
 });
 
-blogsRouter.delete("/:id", async (request, response) => {
-  const id = request.params.id;
-  const user = await request.user;
-  const blog = await Blog.findById(id);
-  if (!blog) {
-    response
-      .status(404)
-      .json({ error: `cannot find blog with id ${id}` })
-      .end();
-  }
-  if (blog.userId.toString() === user.id.toString()) {
-    await Blog.findByIdAndRemove(id);
-    response.status(204).end();
-  } else
-    response
-      .status(401)
-      .json({ error: "You don't have the permission to delete this blog" })
-      .end();
+const blogFinder = async (req, res, next) => {
+  req.blog = await Blog.findByPk(req.params.id);
+  next();
+};
+
+blogsRouter.get("/:id", blogFinder, async (req, res) => {
+  const blog = req.blog;
+
+  // console.log(JSON.stringify(blog));
+  res.json(blog);
 });
 
-blogsRouter.post("/:id/comments", async (request, response) => {
-  const id = request.params.id;
-  const blog = await Blog.findById(id);
-  if (!blog) {
-    response
-      .status(404)
-      .json({ error: `cannot find blog with id ${id}` })
-      .end();
-  }
-  blog.comments = blog.comments.concat(request.body.comment);
-  const savedBlog = await blog.save();
-  response.status(201).json(savedBlog);
+blogsRouter.put("/:id", blogFinder, async (req, res) => {
+  const blog = req.blog;
+
+  blog.likes = req.body.likes;
+  await blog.save();
+  res.json(blog);
+});
+
+blogsRouter.delete("/:id", blogFinder, async (req, res) => {
+  const blog = req.blog;
+
+  await blog.destroy();
+  res.sendStatus(200);
 });
 
 module.exports = blogsRouter;
