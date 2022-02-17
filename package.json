@@ -6,17 +6,11 @@
   "license": "MIT",
   "private": "true",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "eject": "react-scripts eject",
     "start-prod": "cross-env NODE_ENV=production node index.js",
     "start-dev": "cross-env NODE_ENV=development nodemon index.js",
     "migration:down": "node utils/rollback.js"
   },
   "dependencies": {
-    "@testing-library/jest-dom": "^5.15.1",
-    "@testing-library/react": "^12.1.2",
-    "@testing-library/user-event": "^12.1.10",
     "axios": "^0.24.0",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
@@ -30,35 +24,11 @@
     "mongoose-unique-validator": "2.0.3",
     "pg": "^8.7.3",
     "prop-types": "^15.7.2",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
     "sequelize": "^6.16.1",
     "umzug": "^3.0.0",
     "web-vitals": "^1.0.1"
   },
   "devDependencies": {
-    "cypress": "^9.1.0",
-    "jest": "26.6.0",
-    "nodemon": "^2.0.15",
-    "supertest": "^6.1.6"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "nodemon": "^2.0.15"
   }
 }
