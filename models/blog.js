@@ -27,7 +27,6 @@ Blog.init(
     },
     year: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       validate: {
         min: { args: 1991, msg: "Year must be larger than or equal to 1991" },
         max: {
