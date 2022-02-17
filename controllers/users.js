@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const bcrypt = require("bcrypt");
 const usersRouter = require("express").Router();
 const { User, Blog } = require("../models");
@@ -17,12 +16,12 @@ usersRouter.post("/", async (req, res) => {
 
   //check password
   if (!body.password) {
-    return response.status(400).json({
+    return res.status(400).json({
       error: "User validation failed: Path `password` is required.",
     });
   }
   if (body.password.length < 3) {
-    return response.status(400).json({
+    return res.status(400).json({
       error:
         "User validation failed: Path `password` is shorter than the minimum allowed length (3).",
     });

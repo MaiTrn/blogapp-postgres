@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require("../utils/db");
 

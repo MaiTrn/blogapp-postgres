@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const jwt = require("jsonwebtoken");
 const { User } = require("../models");
 const { SECRET } = require("./config");
@@ -9,7 +8,7 @@ const unknownEndpoint = (req, res) => {
 
 const errorHandler = (error, req, res, next) => {
   if (error.name === "NotFound") {
-    return res.status(404).send({ error: `Data with id ${id} not found` });
+    return res.status(404).send({ error: `Data not found` });
   } else if (error.name === "SequelizeValidationError") {
     return res.status(400).json({ error: error.message });
   } else if (error.name === "JsonWebTokenError") {

@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const { Op } = require("sequelize");
 const blogsRouter = require("express").Router();
 const { Blog, User } = require("../models");
