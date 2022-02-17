@@ -26,7 +26,11 @@ blogsRouter.get("/", async (req, res) => {
 
 blogsRouter.post("/", async (req, res) => {
   const blog = await Blog.create({
-    ...req.body,
+    author: req.body.author,
+    title: req.body.title,
+    url: req.body.url,
+    likes: req.body.likes,
+    year: req.body.year,
     userId: req.user.id,
     date: new Date(),
   }); //=== Blog.build(req.body) && blog.save()

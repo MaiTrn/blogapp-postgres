@@ -1,11 +1,12 @@
 const bcrypt = require("bcrypt");
 const usersRouter = require("express").Router();
-const { User, Blog } = require("../models");
+const { User, Blog, ReadingList } = require("../models");
 
 usersRouter.get("/", async (req, res) => {
   const users = await User.findAll({
     include: {
       model: Blog,
+      attributes: { exclude: ["userId"] },
     },
   });
   res.json(users);
@@ -41,7 +42,27 @@ usersRouter.post("/", async (req, res) => {
 });
 
 usersRouter.get("/:id", async (req, res) => {
-  const user = await User.findByPk(req.params.id);
+  const where = {};
+
+  if (req.query.read) {
+    where.read = req.query.read === "true";
+  }
+
+  const user = await User.findByPk(req.params.id, {
+    attributes: ["name", "username"],
+    include: {
+      model: Blog,
+      as: "readings",
+      attributes: {
+        exclude: ["createdAt", "updatedAt", "userId"],
+      },
+      through: {
+        attributes: ["read", "id"],
+        where,
+      },
+    },
+  });
+
   res.json(user);
 });
 
