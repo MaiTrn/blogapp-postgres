@@ -1,9 +1,19 @@
+/* eslint-disable no-undef */
 const bcrypt = require("bcrypt");
 const usersRouter = require("express").Router();
-const User = require("../models/user");
+const { User, Blog } = require("../models");
 
-usersRouter.post("/", async (request, response) => {
-  const body = request.body;
+usersRouter.get("/", async (req, res) => {
+  const users = await User.findAll({
+    include: {
+      model: Blog,
+    },
+  });
+  res.json(users);
+});
+
+usersRouter.post("/", async (req, res) => {
+  const body = req.body;
 
   //check password
   if (!body.password) {
@@ -21,23 +31,28 @@ usersRouter.post("/", async (request, response) => {
   const saltRounds = 10;
   const passwordHash = await bcrypt.hash(body.password, saltRounds);
 
-  const user = new User({
+  const user = {
     name: body.name,
     username: body.username,
     passwordHash,
-  });
+  };
 
-  const savedUser = await user.save();
-  response.json(savedUser);
+  const savedUser = await User.create(user);
+  res.json(savedUser);
 });
 
-usersRouter.get("/", async (request, response) => {
-  const users = await User.find({}).populate("blogs", {
-    url: 1,
-    title: 1,
-    author: 1,
-  });
-  response.json(users);
+usersRouter.get("/:id", async (req, res) => {
+  const user = await User.findByPk(req.params.id);
+  res.json(user);
+});
+
+usersRouter.put("/:username", async (req, res) => {
+  const user = await User.findOne({ where: { username: req.params.username } });
+
+  user.username = req.body.username;
+  await user.save();
+
+  res.json(user);
 });
 
 module.exports = usersRouter;

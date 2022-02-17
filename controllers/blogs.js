@@ -1,16 +1,36 @@
 /* eslint-disable no-undef */
+const { Op } = require("sequelize");
 const blogsRouter = require("express").Router();
-const { Blog } = require("../models");
+const { Blog, User } = require("../models");
 
 blogsRouter.get("/", async (req, res) => {
-  const blogs = await Blog.findAll();
+  let where = {};
+
+  if (req.query.search) {
+    where = {
+      [Op.or]: [
+        { title: { [Op.iLike]: `%${req.query.search}%` } },
+        { author: { [Op.iLike]: `%${req.query.search}%` } },
+      ],
+    };
+  }
+
+  const blogs = await Blog.findAll({
+    attributes: { exclude: ["userId"] },
+    include: { model: User, attributes: ["name"] },
+    where,
+    order: [["likes", "DESC"]],
+  });
   // console.log(JSON.stringify(blogs, null, 2));
   res.json(blogs);
 });
 
 blogsRouter.post("/", async (req, res) => {
-  console.log(req.body);
-  const blog = await Blog.create(req.body);
+  const blog = await Blog.create({
+    ...req.body,
+    userId: req.user.id,
+    date: new Date(),
+  }); //=== Blog.build(req.body) && blog.save()
   res.json(blog);
 });
 
@@ -27,18 +47,27 @@ blogsRouter.get("/:id", blogFinder, async (req, res) => {
 });
 
 blogsRouter.put("/:id", blogFinder, async (req, res) => {
-  const blog = req.blog;
-
-  blog.likes = req.body.likes;
-  await blog.save();
-  res.json(blog);
+  if (req.blog.userId.toString() === req.user.id.toString()) {
+    req.blog.likes = req.body.likes;
+    await req.blog.save();
+    res.json(req.blog);
+  } else
+    res
+      .status(401)
+      .json({ error: "You don't have the permission to update this blog" })
+      .end();
 });
 
 blogsRouter.delete("/:id", blogFinder, async (req, res) => {
-  const blog = req.blog;
-
-  await blog.destroy();
-  res.sendStatus(200);
+  if (req.blog.userId.toString() === req.user.id.toString()) {
+    await req.blog.destroy();
+    res.sendStatus(200);
+  } else {
+    res
+      .status(401)
+      .json({ error: "You don't have the permission to delete this blog" })
+      .end();
+  }
 });
 
 module.exports = blogsRouter;
