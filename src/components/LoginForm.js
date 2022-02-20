@@ -1,64 +1,47 @@
 import React, { useState } from "react";
-import PropTypes from "prop-types";
+import { useDispatch } from "react-redux";
+import { Form, Button } from "react-bootstrap";
+import { loginUser } from "../redux/actions";
 
-const LoginForm = ({ login }) => {
+const LoginForm = () => {
+  const dispatch = useDispatch();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const logInUser = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
-    login({ username, password });
+
+    dispatch(loginUser({ username, password }));
+
     setUsername("");
     setPassword("");
   };
-
   return (
     <div>
-      <h2>Log in to application</h2>
-      <form onSubmit={logInUser}>
-        <table>
-          <tbody>
-            <tr>
-              <th> Username: </th>
-              <td>
-                <input
-                  id="username"
-                  type="text"
-                  value={username}
-                  name="Username"
-                  onChange={({ target }) => setUsername(target.value)}
-                />
-              </td>
-            </tr>
-            <tr>
-              <th> Password: </th>
-              <td>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  name="Password"
-                  onChange={({ target }) => setPassword(target.value)}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td>
-                <button id="login-button" type="submit">
-                  Login
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
+      <Form onSubmit={handleLogin}>
+        <Form.Group>
+          <Form.Label>username </Form.Label>
+          <Form.Control
+            id="username"
+            type="text"
+            value={username}
+            onChange={({ target }) => setUsername(target.value)}
+          />
+          <Form.Label>password </Form.Label>
+          <Form.Control
+            type="password"
+            id="password"
+            value={password}
+            onChange={({ target }) => setPassword(target.value)}
+          />
+          <Button variant="primary" id="login" type="submit">
+            login
+          </Button>
+        </Form.Group>
+      </Form>
     </div>
   );
-};
-
-LoginForm.propTypes = {
-  login: PropTypes.func.isRequired,
 };
 
 export default LoginForm;
