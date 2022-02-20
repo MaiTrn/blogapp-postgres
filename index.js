@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 const express = require("express");
 require("express-async-errors");
+const cors = require("cors");
 const app = express();
 
 const { PORT } = require("./utils/config");
@@ -14,6 +15,8 @@ const logoutRouter = require("./controllers/logout");
 const authorRouter = require("./controllers/authors");
 const readinglistRouter = require("./controllers/readinglists");
 
+app.use(express.static("build"));
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", usersRouter);

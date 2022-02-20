@@ -26,7 +26,6 @@ const tokenExtractor = async (req, res, next) => {
     const session = await ActiveSession.findOne({
       where: { token },
     });
-    console.log(session);
     if (session) {
       req.token = token;
     } else res.status(401).json({ error: "token expired" });
