@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3003;
 const DATABASE_URL = process.env.DATABASE_URL;
 const SECRET = process.env.SECRET;
 
